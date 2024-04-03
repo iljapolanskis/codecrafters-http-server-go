@@ -5,3 +5,5 @@
 go.mod,c/4/c47645c391ad0571c40779079363c9d48412e18b
 =
 app/server.go,5/2/5235f95ddb38f34253e19b12e60a415363822723
+@
+codecrafters.yml,3/e/3e8a63acbeaab815d73aceb66c972df46fef6664
