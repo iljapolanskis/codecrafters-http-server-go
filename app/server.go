@@ -73,6 +73,8 @@ func (r *Response) Write(conn net.Conn) {
 	sb.WriteString("\r\n")
 
 	conn.Write([]byte(sb.String()))
+
+	conn.Close()
 }
 
 type Request struct {
@@ -126,9 +128,9 @@ func NewRequest(conn net.Conn) *Request {
 	}
 
 	return &Request{
-		version: startLineParts[2],
 		method:  startLineParts[0],
 		path:    startLineParts[1],
+		version: startLineParts[2],
 		headers: headers,
 		content: content,
 	}
@@ -156,21 +158,26 @@ func main() {
 		return
 	}
 
-	conn, err := l.Accept()
-	if err != nil {
-		return
+	for {
+		conn, err := l.Accept()
+		if err != nil {
+			return
+		}
+		go handleConnection(conn)
 	}
+}
 
+func handleConnection(conn net.Conn) {
 	request := NewRequest(conn)
 
 	if request.Method() == "GET" {
 		switch {
 		case request.Path() == "/":
 
-			_, err = conn.Write([]byte("HTTP/1.1 200 OK\r\n\r\n"))
-			if err != nil {
-				return
-			}
+			response := NewResponse()
+			response.SetStatus(200)
+			response.Write(conn)
+
 			return
 		case strings.HasPrefix(request.path, "/echo/"):
 			content := strings.TrimPrefix(request.Path(), "/echo/")
