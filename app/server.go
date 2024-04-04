@@ -47,6 +47,8 @@ func (r *Response) SetStatus(statusCode int) {
 	switch statusCode {
 	case 200:
 		r.statusMessage = "OK"
+	case 201:
+		r.statusMessage = "Created"
 	case 404:
 		r.statusMessage = "Not Found"
 	}
@@ -230,6 +232,28 @@ func handleConnection(conn net.Conn) {
 			}
 
 			response.Write(conn)
+			return
+		}
+	}
+
+	if request.Method() == "POST" {
+		switch {
+		case strings.HasPrefix(request.Path(), "/files/") && directory != "":
+			fileName := strings.TrimPrefix(request.Path(), "/files/")
+			fullPath := filepath.Join(directory, fileName)
+
+			file, err := os.Create(fullPath)
+			defer file.Close()
+
+			_, err = file.WriteString(request.Content())
+			if err != nil {
+				return
+			}
+
+			response := NewResponse()
+			response.SetStatus(201)
+			response.Write(conn)
+
 			return
 		}
 	}
