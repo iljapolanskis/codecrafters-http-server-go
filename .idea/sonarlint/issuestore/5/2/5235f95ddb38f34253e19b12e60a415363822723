@@ -1,3 +1,3 @@
 
-“go:S3776
-"RRefactor this method to reduce its Cognitive Complexity from 18 to the 15 allowed.(¤Ñåé8ÿ‹¼¯ê1J$812f6173-4407-4dd6-a82d-b268e813e31e
+sgo:S1135+"2Complete the task associated to this TODO comment.(Ä» ¢8å¸ÛÊê1J$4a6a5c8a-db96-4e07-b8de-be897bd92d34
+•go:S1192#"ODefine a constant instead of duplicating this literal "Content-Length" 3 times.(ëë™Þÿÿÿÿÿ8å¸ÛÊê1J$0cccf808-60f1-4f92-a07d-6583c9483a0c
