@@ -2,7 +2,10 @@ package main
 
 import (
 	"bufio"
+	"io"
 	"net"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 )
@@ -168,6 +171,13 @@ func main() {
 }
 
 func handleConnection(conn net.Conn) {
+	var directory string
+	if len(os.Args) == 3 {
+		if os.Args[1] == "--directory" {
+			directory = os.Args[2]
+		}
+	}
+
 	request := NewRequest(conn)
 
 	if request.Method() == "GET" {
@@ -196,6 +206,30 @@ func handleConnection(conn net.Conn) {
 			response.SetContent(userAgent, "text/plain")
 			response.Write(conn)
 
+			return
+
+		case strings.HasPrefix(request.Path(), "/files/") && directory != "":
+			fileName := strings.TrimPrefix(request.Path(), "/files/")
+			fullPath := filepath.Join(directory, fileName)
+
+			response := NewResponse()
+
+			file, err := os.Open(fullPath)
+			defer file.Close()
+
+			if err != nil {
+				response.SetStatus(404)
+			} else {
+				fileData, err := io.ReadAll(file)
+				if err != nil {
+					return
+				}
+
+				response.SetStatus(200)
+				response.SetContent(string(fileData), "application/octet-stream")
+			}
+
+			response.Write(conn)
 			return
 		}
 	}
